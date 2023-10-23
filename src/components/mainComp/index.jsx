@@ -9,6 +9,7 @@ function MainApp() {
   const [longitude, setLongitude] = useState("");
   const [temperature, setTemperature] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [cityName, setCityName] = useState("");
 
   return (
     <div>
@@ -24,8 +25,13 @@ function MainApp() {
         onLongitude={longitude}
         onTemperature={temperature}
         errorMessage={errorMessage}
+        onCityName={cityName}
       />
-      <DailyForecast onLatitude={latitude} onLongitude={longitude} />
+      <DailyForecast
+        onLatitude={latitude}
+        onLongitude={longitude}
+        onCityName={setCityName}
+      />
     </div>
   );
 }

@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 
-const WeatherForecast = ({ onLatitude, onLongitude, errorMessage }) => {
+const WeatherForecast = ({
+  onLatitude,
+  onLongitude,
+  errorMessage,
+  onCityName,
+}) => {
   const [forecastData, setForecastData] = useState([]);
   const [viewFullWeek, setViewFullWeek] = useState(false);
 
@@ -18,6 +23,7 @@ const WeatherForecast = ({ onLatitude, onLongitude, errorMessage }) => {
       })
       .then((data) => {
         setForecastData(data.list);
+        onCityName(data.city.name);
       })
       .catch((error) => {
         console.log(error);
@@ -28,63 +34,71 @@ const WeatherForecast = ({ onLatitude, onLongitude, errorMessage }) => {
     setViewFullWeek(true);
   };
 
-  const filterNext3Days = () => {
-    const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0); // Set current time to midnight
-    const next3Days = Array.from({ length: 3 }, (_, index) => {
-      const date = new Date(currentDate);
-      date.setDate(date.getDate() + index);
-      return date.toISOString().split("T")[0];
+  const groupDataByDate = () => {
+    const groupedData = {};
+    forecastData.forEach((item) => {
+      const itemDate = new Date(item.dt_txt.replace(" ", "T")); // Convert to a valid date format
+      const options = {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      };
+      const formattedDate = itemDate.toLocaleDateString("en-US", options); // Get formatted date
+      if (!groupedData[formattedDate]) {
+        groupedData[formattedDate] = [];
+      }
+      groupedData[formattedDate].push(item);
     });
-
-    return forecastData.filter((item) => {
-      const itemDate = item.dt_txt.split(" ")[0];
-      return next3Days.includes(itemDate);
-    });
+    return groupedData;
   };
 
-  const next3DaysForecast = filterNext3Days();
+  const groupedForecastData = groupDataByDate();
+  const next3DaysForecast = Object.entries(groupedForecastData).slice(0, 3);
+
+  const renderForecast = viewFullWeek
+    ? Object.entries(groupedForecastData)
+    : next3DaysForecast;
 
   return (
     <div className="text-textCol">
       {forecastData.length > 0 && (
         <div className="mb-4">
           <h2 className="text-2xl font-bold">Weather Forecast</h2>
-          <button
-            onClick={handleViewFullWeek}
-            className="rounded bg-secondary px-2  text-white"
-          >
-            View Full Week
-          </button>
         </div>
       )}
       {errorMessage ? (
         <p className="text-red-600">{errorMessage}</p>
-      ) : viewFullWeek ? (
-        <div className="flex flex-wrap">
-          {forecastData.map((item, index) => (
-            <div key={item.dt} className="p-4">
-              <h3 className="text-lg font-semibold">{item.dt_txt}</h3>
-              <p>Temperature: {item.main.temp}°C</p>
-              <p>Description: {item.weather[0].description}</p>
-              <img
-                src={`https://openweathermap.org/img/wn/${item.weather[0].icon}.png`}
-                alt={item.weather[0].description}
-              />
-            </div>
-          ))}
-        </div>
       ) : (
         <div className="flex flex-wrap">
-          {next3DaysForecast.map((item, index) => (
-            <div key={item.dt} className="p-4">
-              <h3 className="text-lg font-semibold">{item.dt_txt}</h3>
-              <p>Temperature: {item.main.temp}°C</p>
-              <p>Description: {item.weather[0].description}</p>
-              <img
-                src={`https://openweathermap.org/img/wn/${item.weather[0].icon}.png`}
-                alt={item.weather[0].description}
-              />
+          {renderForecast.map(([formattedDate, items], index) => (
+            <div
+              key={formattedDate}
+              className="p-4"
+              style={{ flex: "1 0 100%" }}
+            >
+              <h3 className="text-lg font-semibold">{formattedDate}</h3>
+              <div className="flex">
+                {items.map((item) => (
+                  <div key={item.dt} className="p-4">
+                    <p>{item.dt_txt.split(" ")[1]}</p>
+                    <p>{item.main.temp}°C</p>
+                    <p>{item.weather[0].description}</p>
+                    <img
+                      src={`https://openweathermap.org/img/wn/${item.weather[0].icon}.png`}
+                      alt={item.weather[0].description}
+                    />
+                  </div>
+                ))}
+              </div>
+              {index === 2 && !viewFullWeek && (
+                <button
+                  onClick={handleViewFullWeek}
+                  className="mt-4 rounded bg-secondary px-2 text-white"
+                >
+                  View Full Week
+                </button>
+              )}
             </div>
           ))}
         </div>

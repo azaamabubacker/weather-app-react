@@ -1,7 +1,13 @@
 import React from "react";
 import { useEffect, useState } from "react";
 
-const Result = ({ onLatitude, onLongitude, onTemperature, errorMessage }) => {
+const Result = ({
+  onLatitude,
+  onLongitude,
+  onTemperature,
+  errorMessage,
+  onCityName,
+}) => {
   const [colomboWeather, setColomboWeather] = useState("");
 
   useEffect(() => {
@@ -38,7 +44,7 @@ const Result = ({ onLatitude, onLongitude, onTemperature, errorMessage }) => {
       ) : (
         <>
           <p className="mb-2 text-3xl text-resultBlue">
-            Today's Weather at Your Location
+            {`Today's Weather of ${onCityName}`}
           </p>
           <p className="text-8xl text-resultBlue">{onTemperature}°</p>
         </>
