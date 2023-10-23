@@ -6,7 +6,7 @@ const WeatherForecast = ({ onLatitude, onLongitude, errorMessage }) => {
 
   useEffect(() => {
     const apiKey = "7e006a56658c67b8eb7799d3ed77e4a1";
-    const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${onLatitude}&lon=${onLongitude}&appid=${apiKey}`;
+    const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${onLatitude}&lon=${onLongitude}&units=Metric&appid=${apiKey}`;
 
     fetch(apiUrl)
       .then((response) => {
