@@ -5,12 +5,9 @@ const WeatherForecast = ({ onLatitude, onLongitude, errorMessage }) => {
   const [viewFullWeek, setViewFullWeek] = useState(false);
 
   useEffect(() => {
-    // Your API call for the 5-day forecast using the provided latitude and longitude
-    // Make sure to update this with your API call
     const apiKey = "7e006a56658c67b8eb7799d3ed77e4a1";
     const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${onLatitude}&lon=${onLongitude}&appid=${apiKey}`;
 
-    // Fetch the 5-day forecast data here
     fetch(apiUrl)
       .then((response) => {
         if (response.ok) {
@@ -20,7 +17,6 @@ const WeatherForecast = ({ onLatitude, onLongitude, errorMessage }) => {
         }
       })
       .then((data) => {
-        // Process and set the forecast data as needed
         setForecastData(data.list);
       })
       .catch((error) => {
@@ -32,7 +28,6 @@ const WeatherForecast = ({ onLatitude, onLongitude, errorMessage }) => {
     setViewFullWeek(true);
   };
 
-  // This function filters the forecast data to show only the next 3 days
   const filterNext3Days = () => {
     const currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0); // Set current time to midnight
